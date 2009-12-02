@@ -1,10 +1,9 @@
 require 'user'
 
 class Student < User
-  def initialize(name, password)
-    super(name, password)
-    @marks = {}
-  end
+  has_many :attendance
+  has_many :marks, :through => :attendance
+  has_many :courses, :through => :attendance
 
   def commands
     [:help, :change_password, :get]
@@ -17,12 +16,10 @@ class Student < User
     out << "  get - to get a table of marks\n"
   end
 
-  attr :marks, true
-
   def get
     out = ''
-    @marks.each_pair do |course, marks|
-      out << "#{course} [#{marks.course.teacher.name}] - #{marks.to_s}\n"
+    cources.all do |course|
+      out << "#{course.title} [#{course.teacher.name}] - #{course.marks.to_s}\n"
     end
     out
   end

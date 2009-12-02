@@ -1,7 +1,19 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+user:
+  name: User
+  password: password
+  type: User
 
-# one:
-#   column: value
-#
-# two:
-#   column: value
+admin:
+  name: Admin
+  password: password
+  type: Admin
+
+teacher:
+  name: Teacher
+  password: password
+  type: Teacher
+
+student:
+  name: Student
+  password: password
+  type: Student

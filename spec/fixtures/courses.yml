@@ -1,13 +1,7 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-
-one:
-  title: MyString
-  description: MyString
-  time: MyString
-  teacher: 
-
-two:
-  title: MyString
-  description: MyString
-  time: MyString
-  teacher: 
+math:
+  title: Math
+  description: Science of numbers
+  time: Monday 8.00
+  teacher:
+    name: Teacher
+    password: password 

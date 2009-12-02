@@ -1,13 +1,11 @@
 require 'spec_helper'
+require 'matchers'
 
 describe Admin do
-  before(:each) do
-    @valid_attributes = { 'Administrator', 'password' }
-    @admin = Admin.new(@valid_attributes)
-  end
+  fixtures :users
 
-  it "should create a new instance given valid attributes" do
-    Admin.create!(@valid_attributes)
+  before(:each) do
+    @admin = users(:admin)
   end
 
   it 'should be a kind of user' do
@@ -45,27 +43,28 @@ describe Admin do
 
   it 'should be able to add new student' do
     @admin.add_student('Student', 'password')
-    User.users.keys.should include('Student')
-    User.users['Student'].should be_instance_of(Student)
+    User.should be_exists(:name => 'Student')
+    User.find_by_name('Student').should be_instance_of(Student)
   end
 
   it 'should be able to add new teacher' do
     @admin.add_teacher('Teacher', 'password')
-    User.users.keys.should include('Teacher')
-    User.users['Teacher'].should be_instance_of(Teacher)
+    User.should be_exists(:name => 'Teacher')
+    User.find_by_name('Teacher').should be_instance_of(Teacher)
   end
 
   it 'should be able to remove users' do
-    user = User.new('User', 'password')
-    User.add(user)
+    user = users(:user)
+    user.save
     @admin.remove_user('User')
-    User.users.values.should_not include(user)
+    User.should_not be_exists(:name => 'User')
   end
 
   it 'should be able to change other users passwords' do
-    user = User.new('User', 'password')
-    User.add(user)
+    user = users(:user)
+    user.save
     @admin.change_user_password('User', 'newPassword')
+    user.reload
     user.password.should == 'newPassword'
   end
 
@@ -78,7 +77,7 @@ describe Admin do
   it 'should be able to list all registered users' do
     list = @admin.list_users
     list.should be_instance_of(String)
-    User.users.values.each { |u| list.should include(u.name) }
+    User.all.each { |u| list.should include(u.name) }
   end
 
   it 'should provide help which describes every available command' do
@@ -88,11 +87,7 @@ describe Admin do
   end
 
   after(:each) do
-    if User.users.keys.include?('Teacher')
-      User.remove('Teacher')
-    end
-    if User.users.keys.include?('Student')
-      User.remove('Student')
-    end
+    Teacher.remove_by_name 'Teacher'
+    Student.remove_by_name 'Student'
   end
 end

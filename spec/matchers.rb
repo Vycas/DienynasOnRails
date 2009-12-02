@@ -11,3 +11,9 @@ Spec::Matchers.define :be_between do |from, to|
     value >= from and value <= to
   end
 end
+
+Spec::Matchers.define :exist do |hash|
+  match do |value|
+    value.exists? hash
+  end
+end

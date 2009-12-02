@@ -1,8 +1,8 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  name: MyString
-  password: MyString
+user:
+  name: John
+  password: secret
 
 two:
   name: MyString

@@ -1,11 +1,11 @@
 require 'user'
+require 'student'
+require 'course'
+require 'attendance'
 
 class Teacher < User
-  def initialize(name, password)
-    super(name, password)
-    @courses = {}
-    @current_course = nil
-  end
+  has_many :courses
+  has_many :attendances, :through => :course
 
   def commands
     [:help, :change_password, :add_course, :remove_course, :list_courses,
@@ -26,68 +26,64 @@ class Teacher < User
     out << "  enter <student> <mark> [<course>] - to enter new mark\n"
   end
 
-  attr :courses
-
   def add_course(title, description=nil, time=nil)
-    if @courses.keys.include? title
+    if courses.exists? :title => title
       raise "Course #{title} already exists."
     else
-      @courses[title] = Course.new(self, title, description, time)
+      c = Course.new :title => title, :description => description, :time => time, :teacher => self
+      c.save
     end
   end
 
   def remove_course(title)
-    if @courses.keys.include? title
-      @courses.delete title
-    else
-      raise "Course #{title} doesn't exist."
-    end
+    c = courses.first :conditions => {:title => title}
+    raise "Course #{title} doesn't exist." if c == nil
+    c.destroy
   end
 
   def list_courses
     out = ""
-    @courses.values.each { |c| out << c.to_s + "\n" }
+    courses.all.each { |c| out << c.to_s + "\n" }
     out
   end
 
   def default_course(title)
-    if @courses.keys.include? title
-      @current_course = title
-    else
-      raise "Course #{title} doesn't exist."
-    end
+    raise "Course #{title} doesn't exist." unless courses.exists? :title => title
+    @current_course = title
   end
 
   def assign_student(student, course=@current_course)
-    raise "Student #{student} doesn't exist." if not User.users.keys.include? student
-    raise "#{student} is not a student." if User.users[student].class != Student
-    raise "Course #{course} doesn't exist." if not @courses.keys.include? course
-    marks = Marks.new(@courses[course], User.users[student])
-    @courses[course].marks[student] = marks
-    User.users[student].marks[course] = marks
+    raise "Student #{student} doesn't exist." unless Student.exists? :name => student
+    raise "Course #{course} doesn't exist." unless courses.exists? :title => course
+    c = courses.first :conditions => {:title => course}
+    s = Student.first :conditions => {:name => student}
+    a = Attendance.new :course => c, :student => s
+    a.save
   end
 
   def remove_student(student, course=@current_course)
-    raise "Student #{student} doesn't exist." if not User.users.keys.include? student
-    raise "Course #{course} doesn't exist." if not @courses.keys.include? course
-    raise "#{student} is not listening this course." if not @courses[course].marks.include? student
-    @courses[course].marks.delete student
-    User.users[student].marks.delete course
+    raise "Student #{student} doesn't exist." unless Student.exists? :name => student
+    raise "Course #{course} doesn't exist." unless courses.exists? :title => course
+    c = courses.first :conditions => {:title => course}
+    raise "#{student} is not listening this course." unless c.students.exists? :name => student
+    s = c.students.first :conditions => {:name => student}
+    a = c.attendances.first :conditions => {:student_id => s.id}
+    a.destroy
   end
 
   def list_students(course=@current_course)
-    raise "Course #{course} doesn't exist." if not @courses.keys.include? course
+    raise "Course #{course} doesn't exist." unless courses.exists? :title => course
     out = "Course #{course} is listened by:\n"
-    @courses[course].marks.keys.each { |s| out << "#{s} - #{@courses[course].marks[s]}\n" }
+    courses.first(courses.first(:conditions => {:title => course})).attendances do
+      |a| out << "#{a.student.name} - #{a.marks}\n"
+    end
     out
   end
 
   def enter(student, mark, course=@current_course)
-    raise "Student #{student} doesn't exist." if not User.users.keys.include? student
-    raise "Course #{course} doesn't exist." if not @courses.keys.include? course
-    raise "#{student} is not listening this course." if not @courses[course].marks.include? student
-    mark = mark.to_i if mark.to_i != 0
-    m = Mark.new(mark)
-    @courses[course].marks[student] << m
+    a = Attendance.get(course, student)
+    raise "#{student} is not listening this course." if a == nil
+    m = Mark.new(:value => mark, :attendance => a)
+    m.save
   end
 end

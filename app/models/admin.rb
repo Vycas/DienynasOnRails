@@ -20,12 +20,12 @@ class Admin < User
   end
 
   def add_student(name, password)
-    student = Student.new(:name => name, :password => password)
+    student = Student.new(:name => name, :password => password, :type => 'Student')
     student.save
   end
 
   def add_teacher(name, password)
-    teacher = Teacher.new(:name => name, :password => password)
+    teacher = Teacher.new(:name => name, :password => password, :type => 'Teacher')
     teacher.save
   end
 
@@ -34,10 +34,9 @@ class Admin < User
   end
 
   def change_user_password(username, password)
-    if not User.exists? :name => username
-      raise "User #{username} doesn't exist"
-    end
-    User.find_by_name(username).change_password(password)
+    u = User.find_by_name(username)
+    raise "User #{username} doesn't exist" if u == nil
+    u.change_password(password)
   end
 
   def list_users

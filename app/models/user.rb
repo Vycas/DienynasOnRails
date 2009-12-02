@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+
   def change_password(psw)
     self.password = psw
     self.save
@@ -8,12 +9,12 @@ class User < ActiveRecord::Base
     "#{name} - #{self.class}" 
   end 
 
-  def find_by_name(name)
-    User.find(:first, :conditions => "name = #{name}")
+  def User.find_by_name(name)
+    User.find(:first, :conditions => "name = '#{name}'")
   end
 
-  def remove_by_name(name)
+  def User.remove_by_name(name)
     u = find_by_name(name)
-    u.remove
+    u.destroy if u != nil
   end
 end
