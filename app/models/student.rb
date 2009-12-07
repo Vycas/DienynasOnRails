@@ -18,8 +18,8 @@ class Student < User
 
   def get
     out = ''
-    cources.all do |course|
-      out << "#{course.title} [#{course.teacher.name}] - #{course.marks.to_s}\n"
+    courses.all.each do |course|
+      out << "#{course.title} [#{course.teacher.name}] - #{course.marks.all.collect{|a| a.value}}\n"
     end
     out
   end

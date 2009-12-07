@@ -30,15 +30,15 @@
             <td class="left_align"><a href="app-models-teacher_rb.html">app/models/teacher.rb</a></td>
             <td class='right_align'><tt>89</tt></td>
             <td class='right_align'><tt>78</tt></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>87.64%</tt></div>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>100.00%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:88px"></div>
-            <div class="uncovered" style="width:12px"></div>
+            <div class="covered" style="width:100px"></div>
+            <div class="uncovered" style="width:0px"></div>
           </div></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>85.90%</tt></div>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>100.00%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:86px"></div>
-            <div class="uncovered" style="width:14px"></div>
+            <div class="covered" style="width:100px"></div>
+            <div class="uncovered" style="width:0px"></div>
           </div></td>
           </tr>
         </tbody>
@@ -500,43 +500,43 @@
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line75">75</a>     raise &quot;Course #{course} doesn't exist.&quot; unless courses.exists? :title =&gt; course</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line76">76</a>     out = &quot;Course #{course} is listened by:\n&quot;</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line77">77</a>     courses.first(courses.first(:conditions =&gt; {:title =&gt; course})).attendances do</pre></td>
+          <tr class="marked">
+            <td><pre><a name="line77">77</a>     courses.first(:conditions =&gt; {:title =&gt; course}).attendances.all.each do</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line78">78</a>       |a| out &lt;&lt; &quot;#{a.student.name} - #{a.marks}\n&quot;</pre></td>
+          <tr class="marked">
+            <td><pre><a name="line78">78</a>       |a| out &lt;&lt; &quot;#{a.student.name} - #{a.marks.all.collect{|v| v.value}}\n&quot;</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line79">79</a>     end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line80">80</a>     out</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line81">81</a>   end</pre></td>
           </tr>
         
@@ -555,7 +555,7 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line84">84</a>     a = Attendance.get(course, student)</pre></td>
+            <td><pre><a name="line84">84</a>     a = Attendance.get self.name, course, student</pre></td>
           </tr>
         
           
@@ -566,32 +566,32 @@
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line86">86</a>     m = Mark.new(:value =&gt; mark, :attendance =&gt; a)</pre></td>
+          <tr class="marked">
+            <td><pre><a name="line86">86</a>     m = Mark.new(:value =&gt; mark.to_i, :attendance =&gt; a)</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line87">87</a>     m.save</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line88">88</a>   end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line89">89</a> end</pre></td>
           </tr>
         
       </tbody>
     </table>
 
-    <p>Generated on Thu Dec 03 00:29:12 +0200 2009 with <a href="http://github.com/relevance/rcov">rcov 0.9.6</a></p>
+    <p>Generated on Mon Dec 07 22:41:09 +0200 2009 with <a href="http://github.com/relevance/rcov">rcov 0.9.6</a></p>
 
   </body>
 </html>

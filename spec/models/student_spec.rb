@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'matchers'
 
 describe Student do
   fixtures :users
@@ -26,23 +27,21 @@ describe Student do
   end
 
   it 'should be able to get a table of marks' do
-    teacher = User.add(Teacher.new('Teacher', 'password'))
-    User.add(@student)
+    teacher = users(:ruby_teacher)
+    teacher.save
     teacher.add_course('Math')
     teacher.add_course('IT')
-    teacher.assign_student('Student', 'Math')
-    teacher.assign_student('Student', 'IT')
-    teacher.enter('Student', '10', 'Math')
-    teacher.enter('Student', '6', 'Math')
-    teacher.enter('Student', '5', 'IT')
+    teacher.assign_student('Vycas', 'Math')
+    teacher.assign_student('Vycas', 'IT')
+    teacher.enter('Vycas', '10', 'Math')
+    teacher.enter('Vycas', '6', 'Math')
+    teacher.enter('Vycas', '5', 'IT')
     table = @student.get
     table.should be_instance_of(String)
-    @student.marks.each_pair do |course, marks|
-      line = "#{course} [#{marks.course.teacher.name}] - #{marks.to_s}\n"
+    @student.courses.each do |course|
+      line = "#{course.title} [#{course.teacher.name}] - #{course.marks.all.collect{|v| v.value}}\n"
       table.should include(line)
     end
-    User.remove('Teacher')
-    User.remove('Student')
   end
 
   it 'should provide help which describes every available command' do

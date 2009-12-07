@@ -1,4 +1,4 @@
-#Custom mathers
+require 'spec_helper'
 
 Spec::Matchers.define :have_command do |command|
   match do |object|

@@ -4,7 +4,7 @@ describe Attendance do
   fixtures :users
   
   before(:each) do
-    @teacher = users(:teacher)
+    @teacher = users(:ruby_teacher)
     @student = users(:student)
     @course = Course.new(:teacher => @teacher, :title => 'Math')
     @attendance = Attendance.new(:course => @course, :student => @student)
@@ -19,19 +19,20 @@ describe Attendance do
   end
 
   it 'should be able to get marks average' do
-    @marks << Mark.new(6)
-    @marks << Mark.new(10)
-    @marks << Mark.new(7)
-    @marks.average.should be_close((6+10+7)/3.0, 0.01)
+    Mark.new(:value => 6, :attendance => @attendance).save
+    Mark.new(:value => 10, :attendance => @attendance).save
+    Mark.new(:value => 7, :attendance => @attendance).save
+    @attendance.average.should be_close(7.66, 0.01)
     100.times do
-      @marks << Mark.new(rand(10).to_i + 1)
+      Mark.new(:value => rand(10).to_i + 1, :attendance => @attendance).save
     end
-    @marks.average.should be_between(1, 10)
+    @attendance.average.should be_between(1, 10)
   end
 
   it 'should be able to get n count' do
     count = rand(10).to_i + 1
     count.times { Mark.new(:attendance => @attendance, :value => 'n').save }
+    @attendance.reload
     @attendance.n_count.should == count
   end
 

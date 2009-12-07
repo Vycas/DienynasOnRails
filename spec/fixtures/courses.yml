@@ -1,7 +1,5 @@
-math:
-  title: Math
-  description: Science of numbers
-  time: Monday 8.00
-  teacher:
-    name: Teacher
-    password: password 
+ruby:
+  title: Ruby
+  description: Programming language
+  time: Monday 12.00
+  teacher_id: 3

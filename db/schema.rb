@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(:version => 20091202191734) do
   end
 
   create_table "marks", :force => true do |t|
-    t.integer  "value"
+    t.string   "value"
     t.date     "date"
     t.integer  "attendance_id"
     t.datetime "created_at"

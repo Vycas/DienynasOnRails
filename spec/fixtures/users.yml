@@ -1,19 +1,23 @@
 user:
+  id: 1
   name: User
   password: password
   type: User
 
 admin:
+  id: 2
   name: Admin
   password: password
   type: Admin
 
-teacher:
-  name: Teacher
+ruby_teacher:
+  id: 3
+  name: Saulius
   password: password
   type: Teacher
 
 student:
-  name: Student
+  id: 4
+  name: Vycas
   password: password
   type: Student

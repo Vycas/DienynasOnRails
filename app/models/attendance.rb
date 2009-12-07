@@ -3,19 +3,21 @@ class Attendance < ActiveRecord::Base
   belongs_to :course
   has_many :marks
   
-  def Attendance.get(course, student)
-    c = Course.first :conditions => {:title => course}
+  def Attendance.get(teacher, course, student)
+    t = Teacher.first :conditions => {:name => teacher}
+    raise "Teacher #{teacher} doesn't exist!" if t == nil
+    c = t.courses.first :conditions => {:title => course}
     s = Student.first :conditions => {:name => student}
     raise "Student #{student} doesn't exist!" if s == nil
     raise "Course #{course} doesn't exist!" if c == nil
     Attendance.first :conditions => {:student_id => s.id, :course_id => c.id}
   end
-  
+
   def average
     sum, count = 0, 0
-    marks.all do |m|
-      if (1..10).include? m.value
-        sum += m.value
+    marks.all.each do |m|
+      if (1..10).include? m.value.to_i
+        sum += m.value.to_i
         count += 1
       end
     end
@@ -24,14 +26,13 @@ class Attendance < ActiveRecord::Base
 
   def n_count
     count = 0
-    marks.all { |m| count += 1 if m.value == 100 }
+    marks.all.each { |m| count += 1 if m.value == 'n' }
     count
   end
 
   def p_count
-    size
     count = 0
-    self.each { |m| count += 1 if m.value == 101 }
+    marks.all.each { |m| count += 1 if m.value == 'p' }
     count
   end
 

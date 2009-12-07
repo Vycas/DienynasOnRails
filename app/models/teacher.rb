@@ -74,16 +74,16 @@ class Teacher < User
   def list_students(course=@current_course)
     raise "Course #{course} doesn't exist." unless courses.exists? :title => course
     out = "Course #{course} is listened by:\n"
-    courses.first(courses.first(:conditions => {:title => course})).attendances do
-      |a| out << "#{a.student.name} - #{a.marks}\n"
+    courses.first(:conditions => {:title => course}).attendances.all.each do
+      |a| out << "#{a.student.name} - #{a.marks.all.collect{|v| v.value}}\n"
     end
     out
   end
 
   def enter(student, mark, course=@current_course)
-    a = Attendance.get(course, student)
+    a = Attendance.get self.name, course, student
     raise "#{student} is not listening this course." if a == nil
-    m = Mark.new(:value => mark, :attendance => a)
+    m = Mark.new(:value => mark.to_i, :attendance => a)
     m.save
   end
 end

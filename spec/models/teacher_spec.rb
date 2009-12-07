@@ -3,9 +3,11 @@ require 'matchers'
 
 describe Teacher do
   fixtures :users
+  fixtures :courses
 
   before(:each) do
-    @teacher = users(:teacher)
+    @teacher = users(:ruby_teacher)
+    @course = courses(:ruby)
   end
 
   it 'should be a kind of user' do
@@ -54,21 +56,21 @@ describe Teacher do
   end
 
   it 'should be able to add new courses' do
-    @teacher.add_course("Math", "Science of numbers", "Monday 8.00")
-    @teacher.courses.should exist(:title => "Math")
+    @teacher.add_course("Math", "Science if numbers", "Monday 8.00")
+    @teacher.courses.exists?(:title => "Math").should be_true
+    @teacher.remove_course("Math")
   end
 
   it 'should not be able to add course which already exists' do
-    @teacher.add_course("Math")
     lambda {
-      @teacher.add_course("Math")
+      @teacher.add_course("Ruby")
     }.should raise_error
   end
 
   it 'should be able to remove courses' do
     @teacher.add_course("Math", "Science of numbers", "Monday 8.00")
     @teacher.remove_course("Math")
-    @teacher.courses.should_not exist(:title => "Math")
+    @teacher.courses.exists?(:title => "Math").should be_false
   end
 
   it 'should not be able to remove course which does not exist' do
@@ -83,8 +85,7 @@ describe Teacher do
   end
 
   it 'should be able to set default course' do
-    @teacher.add_course('Math')
-    @teacher.default_course('Math')
+    @teacher.default_course('Ruby')
   end
 
   it 'should not be able to set default course for non-existing course' do
@@ -95,46 +96,43 @@ describe Teacher do
 
   it 'should be able to assign student to courses' do
     student = users(:student)
-    @teacher.add_course('Math')
-    @teacher.assign_student('Student', 'Math')
-    @teacher.courses.first(:conditions => {:title => 'Math'}).students.should exist(:name => 'Student')
-    student.courses.should exist(:title => 'Math')
-    #Student.delete(student)
+    @teacher.assign_student student.name, 'Ruby'
+    @course.reload
+    student.reload
+    @course.students.exists?(:name => student.name).should be_true
+    student.courses.exists?(:title => 'Ruby').should be_true
+    Attendance.get(@teacher.name, @course.title, student.name).should_not be_nil
   end
 
   it 'should be able to remove students from the course' do
     student = users(:student)
-    @teacher.add_course('Math')
-    @teacher.assign_student('Student', 'Math')
-    @teacher.remove_student('Student', 'Math')
-    @teacher.courses.first(:conditions => {:title => 'Math'}).students.should_not exist(:name => 'Student')
-    student.courses.should_not exist(:title => 'Math')
-    #Student.delete(student)
+    @teacher.assign_student student.name, 'Ruby'
+    @teacher.remove_student student.name, 'Ruby'
+    @course.students.exists?(:name => student.name).should be_false
+    student.courses.exists?(:title => 'Ruby').should be_false
+    Attendance.exists?(:student_id => student.id, :course_id => @course.id).should be_false
   end
 
   it 'should be able to list assigned to courses students and their marks' do
     student = users(:student)
-    @teacher.add_course('Math')
-    @teacher.assign_student('Student', 'Math')
-    @teacher.enter('Student', 9, 'Math')
-    list = @teacher.list_students('Math')
-    list.should include("John - #{@teacher.courses['Math'].marks['John']}")
-    #Student.remove('Student')
+    @teacher.assign_student student.name, 'Ruby'
+    @teacher.enter student.name, 9, 'Ruby'
+    list = @teacher.list_students 'Ruby'
+    a = Attendance.get(@teacher.name, 'Ruby', student.name)
+    list.should include("#{student.name} - #{a.marks.all.collect {|v| v.value}}")
   end
 
   it 'should be able to enter new marks' do
     student = users(:student)
-    @teacher.add_course('Math')
-    @teacher.assign_student('Student', 'Math')
-    @teacher.enter('Student', 9, 'Math')
-    a = Attendance.get('Math', 'Student')
-    a.marks[0].value.should == 9
-    #Student.remove('Student')
+    @teacher.assign_student student.name, 'Ruby'
+    @teacher.enter student.name, 9, 'Ruby'
+    a = Attendance.get @teacher.name, 'Ruby', student.name
+    a.marks[0].value.to_i.should == 9
   end
 
   it 'should provide help which describes every available command' do
     help = @teacher.help
-    help.should be_instance_of(String)
+    help.should be_instance_of String
     @teacher.commands.each { |c| help.should include(c.to_s) }
   end
 end
