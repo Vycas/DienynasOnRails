@@ -39,9 +39,25 @@ describe Student do
     table = @student.get
     table.should be_instance_of(String)
     @student.courses.each do |course|
-      line = "#{course.title} [#{course.teacher.name}] - #{course.marks.all.collect{|v| v.value}}\n"
+      line = "#{course.title} [#{course.teacher.name}] - #{course.marks.all.collect{|v| v.value + ' '}}\n"
       table.should include(line)
     end
+  end
+
+  it 'should be able to get a table of marks (Mocks/Stubs)' do
+    teacher = mock()
+    teacher.should_receive(:name).and_return('Kaboom')
+    mark = mock()
+    mark.should_receive(:new).any_number_of_times.and_return { |a| Mark.new(:value => a) }
+    marks = mock()
+    marks.should_receive(:all).and_return([mark.new(3), mark.new(6), mark.new(9)])
+    course = mock()
+    course.should_receive(:title).once.and_return('Omega')
+    course.should_receive(:teacher).and_return(teacher)
+    course.should_receive(:marks).and_return(marks)
+    @student.courses.stub!(:all).and_return([course])
+    list = @student.get
+    list.should include("Omega [Kaboom] - 3 6 9")
   end
 
   it 'should provide help which describes every available command' do

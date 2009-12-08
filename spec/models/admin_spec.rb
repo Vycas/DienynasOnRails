@@ -55,16 +55,15 @@ describe Admin do
 
   it 'should be able to remove users' do
     user = users(:user)
-    user.save
+    User.stub!(:find_by_name).and_return(user)
     @admin.remove_user('User')
     User.should_not be_exists(:name => 'User')
   end
 
   it 'should be able to change other users passwords' do
-    user = users(:user)
-    user.save
-    @admin.change_user_password('User', 'newPassword')
-    user.reload
+    user = User.new(:name => 'Friendly', :password => 'oldPassword')
+    User.stub!(:find_by_name).and_return(user)
+    @admin.change_user_password('Friendly', 'newPassword')
     user.password.should == 'newPassword'
   end
 

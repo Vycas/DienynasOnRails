@@ -46,4 +46,17 @@ describe Attendance do
     @attendance.should respond_to(:to_s)
     @attendance.to_s.should be_instance_of(String)
   end
+  
+  it 'should be able to get attendance with correct parameters' do
+    student = Student.new(:name => 'JayJay')
+    student.save
+    teacher = Teacher.new(:name => 'Kaboom')
+    teacher.save
+    course = Course.new(:teacher => teacher, :title => 'Bla')
+    course.save
+    teacher.assign_student('JayJay', 'Bla')
+    Student.should_receive(:first).with(hash_including(:conditions => {:name => 'JayJay'})).and_return(student)
+    Teacher.should_receive(:first).with(hash_including(:conditions => {:name => 'Kaboom'})).and_return(teacher)
+    Attendance.get(teacher.name, course.title, student.name).should_not be_nil
+  end
 end
